@@ -1,0 +1,27 @@
+{
+  "name": "mindfulai-mental-health-assistant",
+  "version": "1.0.0",
+  "description": "MindfulAI - LLM-Powered Virtual Mental Health Support Assistant",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "keywords": ["mental-health", "llm", "chatbot", "ai-assistant", "wellness"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.3.1",
+    "groq-sdk": "^0.5.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.12.0",
+    "sentiment": "^5.0.2",
+    "uuid": "^9.0.0"
+  }
+}

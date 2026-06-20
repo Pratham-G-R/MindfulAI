@@ -1,0 +1,18 @@
+[build]
+  publish = "public"
+  command = "echo 'No build command needed for vanilla JS/HTML'"
+
+# Re-route all requests to index.html for SPA if necessary,
+# though we don't have deep frontend routes right now, it's good practice.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers for Netlify
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"

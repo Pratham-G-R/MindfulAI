@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MindfulAI - Your compassionate AI-powered mental health support companion. Chat, track mood, practice breathing, and journal.">
+  <meta name="keywords" content="mental health, AI assistant, mood tracker, breathing exercises, journaling, wellness">
+  <meta name="author" content="MindfulAI">
+  <meta name="theme-color" content="#1a1a2e">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="MindfulAI - Mental Health Support Assistant">
+  <meta property="og:description" content="Your compassionate AI-powered mental health support companion">
+  <meta property="og:type" content="website">
+
+  <title>MindfulAI — Mental Health Support Assistant</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ═══ Animated Background ═══ -->
+  <div class="bg-gradient" aria-hidden="true"></div>
+
+  <!-- ═══ Auth Overlay ═══ -->
+  <div class="auth-overlay active" id="authOverlay">
+    <div class="auth-card glass-panel">
+      <div class="auth-header">
+        <span class="auth-logo-icon">🧠</span>
+        <h2 class="auth-title">Welcome to MindfulAI</h2>
+        <p class="auth-subtitle">Your compassionate mental health companion</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="app.switchAuthTab('login')">Log In</button>
+        <button class="auth-tab" id="tabSignup" onclick="app.switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <form id="authForm" class="auth-form" onsubmit="event.preventDefault(); app.handleAuth();">
+        <div class="form-group">
+          <label for="authEmail">Email</label>
+          <input type="email" id="authEmail" class="glass-input" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="authPassword">Password</label>
+          <input type="password" id="authPassword" class="glass-input" required placeholder="••••••••">
+        </div>
+        <div id="authError" class="auth-error"></div>
+        <button type="submit" id="authSubmitBtn" class="primary-btn full-width">Log In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ App Container ═══ -->
+  <div class="app" id="app" style="display: none;">
+
+    <!-- ═══ Sidebar Navigation ═══ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">🧠</span>
+          <span class="logo-text">MindfulAI</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebarNav">
+        <button class="nav-item active" data-view="chat" id="nav-chat">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Chat</span>
+        </button>
+        <button class="nav-item" data-view="mood" id="nav-mood">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Mood Tracker</span>
+        </button>
+        <button class="nav-item" data-view="breathing" id="nav-breathing">
+          <span class="nav-icon">🫁</span>
+          <span class="nav-label">Breathing</span>
+        </button>
+        <button class="nav-item" data-view="journal" id="nav-journal">
+          <span class="nav-icon">📓</span>
+          <span class="nav-label">Journal</span>
+        </button>
+        <button class="nav-item" data-view="resources" id="nav-resources">
+          <span class="nav-icon">🛟</span>
+          <span class="nav-label">Resources</span>
+        </button>
+        <button class="nav-item" data-view="settings" id="nav-settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </button>
+      </nav>
+
+      <!-- Logout Button -->
+      <div class="sidebar-footer">
+        <button class="nav-item danger-btn" onclick="app.logout()">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ═══ Mobile Header ═══ -->
+    <header class="mobile-header" id="mobileHeader">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="mobile-logo">
+        <span class="logo-icon">🧠</span>
+        <span class="logo-text">MindfulAI</span>
+      </div>
+      <div class="header-spacer"></div>
+    </header>
+
+    <!-- ═══ Mobile Overlay ═══ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="main-content" id="mainContent">
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- CHAT VIEW                                                     -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="view active" id="view-chat">
+        <div class="view-header">
+          <h1 class="view-title">Chat with MindfulAI</h1>
+          <p class="view-subtitle">Your safe space to talk, reflect, and find support</p>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+          <!-- Welcome message -->
+          <div class="chat-welcome" id="chatWelcome">
+            <div class="welcome-icon">🌿</div>
+            <h2>Welcome to MindfulAI</h2>
+            <p>I'm here to listen, support, and help you explore your thoughts and feelings. Everything you share here stays private.</p>
+            <div class="suggested-prompts" id="suggestedPrompts">
+              <button class="prompt-chip" data-prompt="I'm feeling anxious today">😰 I'm feeling anxious</button>
+              <button class="prompt-chip" data-prompt="Help me relax and calm down">🧘 Help me relax</button>
+              <button class="prompt-chip" data-prompt="I need someone to talk to">💭 I need to talk</button>
+              <button class="prompt-chip" data-prompt="Teach me a coping technique">🛠️ Coping techniques</button>
+              <button class="prompt-chip" data-prompt="I'm having trouble sleeping">🌙 Trouble sleeping</button>
+              <button class="prompt-chip" data-prompt="I've been feeling down lately">🌧️ Feeling down</button>
+            </div>
+          </div>
+
+          <!-- Chat Messages Area -->
+          <div class="chat-messages" id="chatMessages"></div>
+
+          <!-- Typing Indicator -->
+          <div class="typing-indicator" id="typingIndicator" style="display:none;">
+            <div class="typing-avatar">🧠</div>
+            <div class="typing-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area" id="chatInputArea">
+          <div class="input-wrapper">
+            <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1" maxlength="2000"></textarea>
+            <button class="send-btn" id="sendBtn" aria-label="Send message" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+          <p class="input-hint">Press Enter to send • Shift+Enter for new line</p>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- MOOD TRACKER VIEW                                             -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="view" id="view-mood">
+        <div class="view-header">
+          <h1 class="view-title">Mood Tracker</h1>
+          <p class="view-subtitle">Track your emotional patterns and gain self-awareness</p>
+        </div>
+
+        <div class="mood-logger glass-card">
+          <h2>How are you feeling right now?</h2>
+          <div class="mood-selector" id="moodSelector">
+            <button class="mood-btn" data-mood="😄" data-score="5" title="Great">
+              <span class="mood-emoji">😄</span>
+              <span class="mood-label">Great</span>
+            </button>
+            <button class="mood-btn" data-mood="🙂" data-score="4" title="Good">
+              <span class="mood-emoji">🙂</span>
+              <span class="mood-label">Good</span>
+            </button>
+            <button class="mood-btn" data-mood="😐" data-score="3" title="Okay">
+              <span class="mood-emoji">😐</span>
+              <span class="mood-label">Okay</span>
+            </button>
+            <button class="mood-btn" data-mood="😔" data-score="2" title="Low">
+              <span class="mood-emoji">😔</span>
+              <span class="mood-label">Low</span>
+            </button>
+            <button class="mood-btn" data-mood="😢" data-score="1" title="Struggling">
+              <span class="mood-emoji">😢</span>
+              <span class="mood-label">Struggling</span>
+            </button>
+          </div>
+          <textarea class="mood-note" id="moodNote" placeholder="Add a note about how you're feeling (optional)..." rows="2" maxlength="500"></textarea>
+          <button class="btn btn-primary" id="logMoodBtn" disabled>Log Mood</button>
+        </div>
+
+        <div class="mood-chart-container glass-card">
+          <h2>Your Mood Over Time</h2>
+          <div class="chart-controls">
+            <button class="chart-period active" data-days="7">7 Days</button>
+            <button class="chart-period" data-days="30">30 Days</button>
+            <button class="chart-period" data-days="90">90 Days</button>
+          </div>
+          <canvas id="moodChart" width="800" height="300"></canvas>
+          <div class="no-data-msg" id="noMoodData" style="display:none;">
+            <p>📊 No mood data yet. Start logging your moods to see patterns!</p>
+          </div>
+        </div>
+
+        <div class="mood-stats glass-card" id="moodStats">
+          <h2>Mood Insights</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-value" id="avgMoodScore">—</span>
+              <span class="stat-label">Avg Score</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value" id="totalMoodEntries">0</span>
+              <span class="stat-label">Total Entries</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value" id="topMood">—</span>
+              <span class="stat-label">Most Common</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value" id="moodTrend">—</span>
+              <span class="stat-label">Trend</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- BREATHING EXERCISES VIEW                                      -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="view" id="view-breathing">
+        <div class="view-header">
+          <h1 class="view-title">Breathing Exercises</h1>
+          <p class="view-subtitle">Calm your mind with guided breathing techniques</p>
+        </div>
+
+        <div class="breathing-techniques">
+          <button class="technique-card glass-card active" data-technique="4-7-8" id="tech-478">
+            <h3>4-7-8 Relaxing</h3>
+            <p>Inhale 4s • Hold 7s • Exhale 8s</p>
+            <span class="technique-tag">Best for Sleep</span>
+          </button>
+          <button class="technique-card glass-card" data-technique="box" id="tech-box">
+            <h3>Box Breathing</h3>
+            <p>Inhale 4s • Hold 4s • Exhale 4s • Hold 4s</p>
+            <span class="technique-tag">Focus & Calm</span>
+          </button>
+          <button class="technique-card glass-card" data-technique="calm" id="tech-calm">
+            <h3>Calm Breathing</h3>
+            <p>Inhale 4s • Exhale 6s</p>
+            <span class="technique-tag">Anxiety Relief</span>
+          </button>
+        </div>
+
+        <div class="breathing-exercise glass-card">
+          <div class="breath-circle-container">
+            <div class="breath-circle" id="breathCircle">
+              <div class="breath-inner">
+                <span class="breath-phase" id="breathPhase">Ready</span>
+                <span class="breath-timer" id="breathTimer">0</span>
+              </div>
+            </div>
+            <div class="breath-ring" id="breathRing"></div>
+          </div>
+
+          <div class="breath-controls">
+            <button class="btn btn-primary btn-lg" id="startBreathingBtn">Start</button>
+            <button class="btn btn-secondary btn-lg" id="stopBreathingBtn" style="display:none;">Stop</button>
+          </div>
+
+          <div class="breath-stats-row">
+            <div class="breath-stat">
+              <span class="breath-stat-val" id="breathCycles">0</span>
+              <span class="breath-stat-label">Cycles</span>
+            </div>
+            <div class="breath-stat">
+              <span class="breath-stat-val" id="breathDuration">0:00</span>
+              <span class="breath-stat-label">Duration</span>
+            </div>
+            <div class="breath-stat">
+              <span class="breath-stat-val" id="breathStreak">0</span>
+              <span class="breath-stat-label">Day Streak</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- JOURNAL VIEW                                                  -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="view" id="view-journal">
+        <div class="view-header">
+          <h1 class="view-title">Journal</h1>
+          <p class="view-subtitle">Express yourself freely and reflect on your journey</p>
+        </div>
+
+        <!-- Journal Entry Form -->
+        <div class="journal-form glass-card" id="journalForm">
+          <div class="journal-prompt-bar">
+            <button class="btn btn-sm btn-secondary" id="gratitudePromptBtn">✨ Gratitude Prompt</button>
+            <button class="btn btn-sm btn-secondary" id="reflectionPromptBtn">🪞 Reflection Question</button>
+          </div>
+          <div class="prompt-display" id="promptDisplay" style="display:none;">
+            <p id="promptText"></p>
+          </div>
+          <input type="text" class="journal-title-input" id="journalTitle" placeholder="Entry title..." maxlength="200">
+          <textarea class="journal-content-input" id="journalContent" placeholder="Write your thoughts here..." rows="6" maxlength="5000"></textarea>
+          <div class="journal-meta-row">
+            <input type="text" class="journal-tags-input" id="journalTags" placeholder="Tags (comma-separated)...">
+            <textarea class="journal-gratitude-input" id="journalGratitude" placeholder="What are you grateful for today?" rows="2" maxlength="500"></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveJournalBtn">Save Entry</button>
+        </div>
+
+        <!-- Journal Search -->
+        <div class="journal-search">
+          <input type="text" class="search-input" id="journalSearch" placeholder="🔍 Search your entries...">
+        </div>
+
+        <!-- Journal Entries List -->
+        <div class="journal-entries" id="journalEntries">
+          <div class="no-data-msg" id="noJournalData">
+            <p>📝 No journal entries yet. Start writing to track your emotional journey!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- RESOURCES VIEW                                                -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="view" id="view-resources">
+        <div class="view-header">
+          <h1 class="view-title">Resources</h1>
+          <p class="view-subtitle">Help is always available — you are not alone</p>
+        </div>
+
+        <!-- Crisis Helplines -->
+        <div class="resource-section">
+          <h2 class="section-title">🚨 Crisis Helplines</h2>
+          <div class="resource-grid">
+            <div class="resource-card glass-card crisis-card">
+              <h3>National Suicide Prevention Lifeline</h3>
+              <p class="resource-number">📞 988</p>
+              <p>24/7 free and confidential support (US)</p>
+            </div>
+            <div class="resource-card glass-card crisis-card">
+              <h3>Crisis Text Line</h3>
+              <p class="resource-number">💬 Text HOME to 741741</p>
+              <p>Free 24/7 crisis counseling via text</p>
+            </div>
+            <div class="resource-card glass-card crisis-card">
+              <h3>iCall (India)</h3>
+              <p class="resource-number">📞 9152987821</p>
+              <p>Mon-Sat, 8am-10pm IST</p>
+            </div>
+            <div class="resource-card glass-card crisis-card">
+              <h3>Vandrevala Foundation (India)</h3>
+              <p class="resource-number">📞 1860-2662-345</p>
+              <p>24/7 multilingual support</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CBT Techniques -->
+        <div class="resource-section">
+          <h2 class="section-title">🧠 CBT Techniques</h2>
+          <div class="resource-grid">
+            <div class="resource-card glass-card">
+              <h3>Cognitive Restructuring</h3>
+              <p>Identify negative thoughts → Examine evidence → Create balanced thoughts. Challenge "all-or-nothing" thinking patterns.</p>
+            </div>
+            <div class="resource-card glass-card">
+              <h3>Behavioral Activation</h3>
+              <p>Schedule enjoyable activities even when unmotivated. Start small: a 5-minute walk, calling a friend, or making your bed.</p>
+            </div>
+            <div class="resource-card glass-card">
+              <h3>Thought Records</h3>
+              <p>Write down: Situation → Automatic Thought → Emotion → Evidence For/Against → Balanced Thought → New Feeling.</p>
+            </div>
+            <div class="resource-card glass-card">
+              <h3>Grounding (5-4-3-2-1)</h3>
+              <p>Name 5 things you see, 4 you touch, 3 you hear, 2 you smell, 1 you taste. Brings you back to the present.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Self-Help Tips -->
+        <div class="resource-section">
+          <h2 class="section-title">💡 Daily Wellness Tips</h2>
+          <div class="resource-grid">
+            <div class="resource-card glass-card">
+              <h3>Sleep Hygiene</h3>
+              <p>Consistent schedule, no screens 30min before bed, cool room (65-68°F), avoid caffeine after 2pm.</p>
+            </div>
+            <div class="resource-card glass-card">
+              <h3>Mindful Movement</h3>
+              <p>Even 10 minutes of walking, stretching, or yoga can significantly reduce stress and improve mood.</p>
+            </div>
+            <div class="resource-card glass-card">
+              <h3>Social Connection</h3>
+              <p>Reach out to one person daily. Quality matters more than quantity — even a brief check-in helps.</p>
+            </div>
+            <div class="resource-card glass-card">
+              <h3>Nutrition & Hydration</h3>
+              <p>Eat regular meals. Omega-3s, whole grains, and leafy greens support mental health. Stay hydrated.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="disclaimer-box glass-card">
+          <p><strong>⚠️ Important Disclaimer:</strong> MindfulAI is an AI-powered wellness tool and is <strong>not a substitute</strong> for professional mental health treatment. If you are in crisis or need immediate help, please contact the helplines above or your local emergency services.</p>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- SETTINGS VIEW                                                 -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="view" id="view-settings">
+        <div class="view-header">
+          <h1 class="view-title">Settings</h1>
+          <p class="view-subtitle">Customize your MindfulAI experience</p>
+        </div>
+
+        <div class="settings-section glass-card">
+          <h2>Appearance</h2>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Dark Mode</span>
+              <span class="setting-desc">Switch between dark and light theme</span>
+            </div>
+            <label class="toggle-switch" id="themeToggle">
+              <input type="checkbox" id="themeCheckbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section glass-card">
+          <h2>Data Management</h2>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Export Chat History</span>
+              <span class="setting-desc">Download your conversation as a text file</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="exportChatBtn">Export</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Clear Chat History</span>
+              <span class="setting-desc">Remove all chat messages (cannot be undone)</span>
+            </div>
+            <button class="btn btn-danger btn-sm" id="clearChatBtn">Clear</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Export All Data</span>
+              <span class="setting-desc">Download mood logs, journal entries, and sessions</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="exportAllBtn">Export</button>
+          </div>
+        </div>
+
+        <div class="settings-section glass-card">
+          <h2>About MindfulAI</h2>
+          <div class="about-info">
+            <p><strong>Version:</strong> 1.0.0</p>
+            <p><strong>Built with:</strong> Node.js, Express, Groq LLM API, SQLite</p>
+            <p><strong>Purpose:</strong> Providing accessible, compassionate mental health support through AI technology.</p>
+            <p class="disclaimer-text">MindfulAI is not a medical device and should not be used as a substitute for professional mental health care. Always consult with a qualified healthcare professional for medical advice.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ═══ Toast Notification Container ═══ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ═══ Confirmation Modal ═══ -->
+  <div class="modal-overlay" id="confirmModal" style="display:none;">
+    <div class="modal glass-card">
+      <h3 id="modalTitle">Confirm Action</h3>
+      <p id="modalMessage">Are you sure?</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
