@@ -105,7 +105,8 @@ app.use((err, req, res, next) => {
 // ─── Start Server ───────────────────────────────────────────────────────────
 async function startServer() {
   try {
-    console.log('✅ Database initialized successfully');
+    // Database is initialized in database.js
+    console.log('✅ Database connected');
 
     const server = app.listen(PORT, () => {
       console.log(`
