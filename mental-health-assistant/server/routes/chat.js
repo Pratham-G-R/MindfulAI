@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
     );
 
     // 4. Generate AI Response
-    const responseText = await generateResponse(formattedHistory, sentiment, isCrisis);
+    cconst responseText = await generateResponse(message, formattedHistory);
 
     // 5. Save AI Message to DB
     const aiMsgId = uuidv4();
