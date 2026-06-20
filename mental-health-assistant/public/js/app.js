@@ -9,7 +9,7 @@
 class MindfulAI {
   constructor() {
     // ─── State ────────────────────────────────────────────────────────
-    this.apiUrl = ''; // Set to backend URL if deploying frontend separately
+    this.apiUrl = 'https://mindfulai-bw54.onrender.com'; 
     this.jwtToken = localStorage.getItem('mindfulai_token') || null;
     this.authMode = 'login'; // login or signup
     this.currentView = 'chat';
